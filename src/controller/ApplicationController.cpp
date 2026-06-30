@@ -8,7 +8,6 @@ ApplicationController::ApplicationController(
     source_(source),
     vital_source_(vital_source),
     model_(model)
-    
 {
 }
 

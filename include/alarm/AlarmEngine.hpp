@@ -4,11 +4,11 @@
 
 struct AlarmState
 {
-    bool ecg_alarm = false;
     bool hr_alarm = false;
     bool spo2_alarm = false;
     bool rr_alarm = false;
-    bool bp_alarm = false;
+    bool sys_alarm = false;
+    bool dias_alarm = false;
 };
 
 class AlarmEngine : public IObserver
@@ -21,12 +21,16 @@ class AlarmEngine : public IObserver
         void CheckThresholds();
 
         // thresh
-        const uint16_t ecg_threshold = 200 ; 
-        const uint8_t hr_low_threshold   = 60;
-        const uint8_t hr_high_threshold = 85;
-        const uint8_t spo2_low_threshold = 90;
-        const uint8_t rr_low_threshold   = 12;
-        const uint8_t sys_low_threshold  = 100;
+        static constexpr const uint8_t hr_low_threshold   = 60;
+        static constexpr const uint8_t hr_high_threshold = 100;
+        static constexpr const uint8_t spo2_low_threshold = 90;
+        static constexpr const uint8_t rr_low_threshold   = 12;
+        static constexpr const uint8_t rr_high_threshold = 20;
+        static constexpr const uint8_t sys_low_threshold  = 90;
+        static constexpr const uint8_t sys_high_threshold = 140;
+        static constexpr const uint8_t dias_low_threshold = 60;
+        static constexpr const uint8_t dias_high_threshold = 90;
+
 
     public:
         // we used explicit because so we have valid parameterisation 

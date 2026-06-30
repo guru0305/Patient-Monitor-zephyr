@@ -20,11 +20,11 @@ void AlarmEngine :: CheckThresholds()
 {
     const PatientData& data =  model_.get_patient_data();
     
-    alarm_state_.ecg_alarm = (data.ecg >= ecg_threshold);
     alarm_state_.hr_alarm = (data.hr >= hr_high_threshold || data.hr <= hr_low_threshold);
     alarm_state_.spo2_alarm = (data.spo2 <= spo2_low_threshold);
-    alarm_state_.rr_alarm = (data.rr <= rr_low_threshold);
-    alarm_state_.bp_alarm = (data.sys <= sys_low_threshold);
+    alarm_state_.rr_alarm = (data.rr >= rr_high_threshold || data.rr <= rr_low_threshold );
+    alarm_state_.sys_alarm = (data.sys >= sys_high_threshold || data.sys <= sys_low_threshold); 
+    alarm_state_.dias_alarm = (data.dias >= dias_high_threshold || data.dias <= dias_low_threshold);
 
 }
 

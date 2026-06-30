@@ -6,9 +6,8 @@ class ApplicationController
 {
 private:
     IDataSource& source_;
-    FakeVitalSource& vital_source_;
     DataModel& model_;
-    
+    FakeVitalSource& vital_source_;
 
 public:
     ApplicationController(

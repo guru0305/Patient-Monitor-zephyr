@@ -1,17 +1,11 @@
 #include "ui/ScreenBuilder.hpp"
 #include "lvgl.h"
+#include<cmath>
+#include<cstdio>
 
 extern const lv_image_dsc_t heart;
 extern const lv_image_dsc_t spo2;
 extern const lv_image_dsc_t rr;
-
-const int one_beat[] =
-{
-    50,50,50,50,48,45,48,50,
-    50,40,25,75,40,50,
-    50,55,65,69,65,55,
-    50,50,50,50
-};
 
 static void heart_anim_cb(void* var, int32_t value)
 {
@@ -23,39 +17,69 @@ static void rr_anim_cb(void* var, int32_t value)
     lv_image_set_scale((lv_obj_t*)var, value);
 }
 
-void ScreenBuilder::UpdateHR(uint8_t hr)
+static void flash_cb(void * var, int32_t value)
+{
+    lv_obj_set_style_bg_opa((lv_obj_t *)var,value ? LV_OPA_COVER : LV_OPA_0, LV_PART_MAIN);    
+}
+
+void ScreenBuilder::UpdateHR(uint8_t hr,bool hr_state)
 {
     char buffer[8];
     snprintf(buffer,sizeof(buffer),"%u",hr);
     lv_label_set_text(hr_value_label,buffer);
+    lv_obj_set_style_bg_color(hr_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
+    lv_obj_set_style_text_color(hr_value_label,hr_state ?lv_color_hex(0Xffffff) : lv_color_hex(0x00FF00), LV_PART_MAIN);
+    lv_obj_set_style_border_color(hr_panel, hr_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
+    UpdateFlashState(hr_value_label, hr_state);
 }
 
-void ScreenBuilder::UpdateSPO2(uint8_t spo2)
+void ScreenBuilder::UpdateSPO2(uint8_t spo2,bool spo2_state)
 {
     char buffer[8];
     snprintf(buffer,sizeof(buffer),"%u",spo2);
     lv_label_set_text(spo2_value_label,buffer);
+    lv_obj_set_style_bg_color(spo2_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
+    lv_obj_set_style_text_color(spo2_value_label,spo2_state ?lv_color_hex(0Xffffff) : lv_color_hex(0x00ffff), LV_PART_MAIN);
+    lv_obj_set_style_border_side(spo2_panel,spo2_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
+    lv_obj_set_style_border_color(spo2_panel, spo2_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
+    UpdateFlashState(spo2_value_label, spo2_state);
 }
 
-void ScreenBuilder::UpdateRR(uint8_t rr)
+void ScreenBuilder::UpdateRR(uint8_t rr,bool rr_state)
 {
     char buffer[8];
     snprintf(buffer,sizeof(buffer),"%u",rr);
     lv_label_set_text(rr_value_label,buffer);
+    lv_obj_set_style_bg_color(rr_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
+    lv_obj_set_style_text_color(rr_value_label,rr_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffff00), LV_PART_MAIN);
+    lv_obj_set_style_border_side(rr_panel,rr_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
+    lv_obj_set_style_border_color(rr_panel, rr_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
+    UpdateFlashState(rr_value_label, rr_state);
 }
 
-void ScreenBuilder::UpdateSYS(uint8_t sys)
+void ScreenBuilder::UpdateSYS(uint8_t sys,bool sys_state)
 {
     char buffer[8];
     snprintf(buffer,sizeof(buffer),"%u",sys);
     lv_label_set_text(systolic_value_label,buffer);
+    lv_obj_set_style_bg_color(systolic_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
+    lv_obj_set_style_text_color(systolic_value_label,sys_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_set_style_border_side(NIBP_panel,sys_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
+    lv_obj_set_style_border_color(NIBP_panel, sys_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
+    UpdateFlashState(systolic_value_label, sys_state);
+
 }
 
-void ScreenBuilder::UpdateDIAS(uint8_t dias)
+void ScreenBuilder::UpdateDIAS(uint8_t dias,bool dias_state)
 {
     char buffer[8];
     snprintf(buffer,sizeof(buffer),"%u",dias);
     lv_label_set_text(diastolic_value_label,buffer);
+    lv_obj_set_style_bg_color(diastolic_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
+    lv_obj_set_style_text_color(diastolic_value_label,dias_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_set_style_border_side(NIBP_panel,dias_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
+    lv_obj_set_style_border_color(NIBP_panel, dias_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
+    UpdateFlashState(diastolic_value_label, dias_state);
 }
 
 void ScreenBuilder::UpdateMEAN(uint8_t mean)
@@ -65,24 +89,33 @@ void ScreenBuilder::UpdateMEAN(uint8_t mean)
     lv_label_set_text(mean_value_label,buffer);
 }
 
-void ScreenBuilder::UpdateAlarmBar(const char* text, bool state)
+void ScreenBuilder::AddECGSample(uint16_t sample)
 {
-    if(state)
-    {
-        lv_label_set_text(alarm_label,text);
-        lv_obj_set_style_bg_color(alarm_panel, lv_color_hex(0x0d0000), LV_PART_MAIN);
-        lv_obj_set_style_border_color(alarm_panel, lv_color_hex(0xff0000), LV_PART_MAIN);
-        lv_obj_set_style_text_color(alarm_label, lv_color_hex(0xff0000), LV_PART_MAIN);
-    }
-    else
-    {
-        lv_label_set_text(alarm_label,text);
-        lv_obj_set_style_bg_color(alarm_panel, lv_color_hex(0x002200), LV_PART_MAIN);
-        lv_obj_set_style_border_color(alarm_panel, lv_color_hex(0x00ff00), LV_PART_MAIN);
-        lv_obj_set_style_text_color(alarm_label, lv_color_hex(0x00ff00), LV_PART_MAIN);
-    }    
+    //std::cout << sample << std::endl;
+    lv_chart_set_next_value(ecg_chart, ecg_series, sample);
 }
 
+void ScreenBuilder::UpdateAlarmBar(const char* text, bool state)
+{
+    lv_label_set_text(alarm_label,text);
+    lv_obj_set_style_bg_color(alarm_panel,state ? lv_color_hex(0x0d0000) : lv_color_hex(0x002200), LV_PART_MAIN);
+    lv_obj_set_style_border_color(alarm_panel,state ? lv_color_hex(0xff0000) : lv_color_hex(0x00ff00), LV_PART_MAIN);
+    lv_obj_set_style_text_color(alarm_label,state ? lv_color_hex(0xff0000) : lv_color_hex(0x00ff00), LV_PART_MAIN);
+}
+
+void ScreenBuilder::UpdateFlashState(lv_obj_t* obj, bool alarm)
+{
+    bool flashing = (lv_anim_get(obj, flash_cb) != nullptr);
+
+    if(alarm && !flashing)
+    {
+        StartFlash(obj);
+    }
+    else if(!alarm && flashing)
+    {
+        StopFlash(obj);
+    }
+}
 
 void ScreenBuilder::build()
 {
@@ -116,7 +149,7 @@ void ScreenBuilder::create_header()
     header_label = lv_label_create(header);
     lv_label_set_text(header_label, "BED 01");
     lv_obj_align(header_label, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_text_color(header_label, lv_color_hex(0xFFFFFF), LV_PART_MAIN);
+    lv_obj_set_style_text_color(header_label, lv_color_hex(0xFFffff), LV_PART_MAIN);
     lv_obj_set_style_text_font(header_label, &lv_font_montserrat_16, LV_PART_MAIN);
     lv_obj_clear_flag(header_label, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -151,6 +184,33 @@ void ScreenBuilder::create_alarmtab()
     lv_obj_set_style_text_color(alarm_label, lv_color_hex(0x00FF00), LV_PART_MAIN);
     lv_obj_align(alarm_label, LV_ALIGN_CENTER, 0, 0);
 
+}
+
+void ScreenBuilder::StartFlash(lv_obj_t* obj)
+{
+    lv_anim_t anim;
+    lv_anim_init(&anim);
+
+    lv_anim_set_var(&anim, obj);
+    lv_anim_set_exec_cb(&anim, flash_cb);
+
+    lv_anim_set_values(&anim, 1, 0);
+    lv_anim_set_path_cb(&anim, lv_anim_path_step);
+    lv_anim_set_duration(&anim, 150);
+    lv_anim_set_playback_duration(&anim, 150);
+    lv_anim_set_repeat_count(&anim, LV_ANIM_REPEAT_INFINITE);
+
+    lv_anim_start(&anim);
+}
+
+void ScreenBuilder::StopFlash(lv_obj_t* obj)
+{
+    lv_anim_delete(obj, flash_cb);
+
+    lv_obj_set_style_bg_opa(
+        obj,
+        LV_OPA_0,
+        LV_PART_MAIN);
 }
 
 void ScreenBuilder::create_hr_panel()
@@ -409,23 +469,16 @@ void ScreenBuilder::create_ecg_panel()
     lv_obj_set_style_border_width(ecg_chart, 2, LV_PART_MAIN);
     lv_obj_set_style_bg_color(ecg_chart, lv_color_hex(0X000000), LV_PART_MAIN);
     lv_chart_set_type(ecg_chart, LV_CHART_TYPE_LINE);
-    lv_chart_set_range(ecg_chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
+    lv_chart_set_range(ecg_chart, LV_CHART_AXIS_PRIMARY_Y, 0, 250);
     lv_chart_set_point_count(ecg_chart, 150);
     lv_obj_set_style_size(ecg_chart, 0,0, LV_PART_INDICATOR);
     lv_obj_set_style_line_width(ecg_chart, 3, LV_PART_INDICATOR);
     lv_chart_set_div_line_count(ecg_chart, 20, 30);
     lv_obj_set_style_line_opa(ecg_chart, LV_OPA_20, LV_PART_MAIN);
-    lv_chart_series_t* ecg_series = lv_chart_add_series(ecg_chart, lv_color_hex(0x00ff00), LV_CHART_AXIS_PRIMARY_Y);
-    for(int beat = 0; beat < 10; beat++)
+    ecg_series = lv_chart_add_series(ecg_chart, lv_color_hex(0x00ff00), LV_CHART_AXIS_PRIMARY_Y);
+    for(int i=0;i<120;i++)
     {
-        for (size_t i = 0; i < sizeof(one_beat) / sizeof(one_beat[0]); ++i)
-        {
-            lv_chart_set_next_value(
-                ecg_chart,
-                ecg_series,
-                one_beat[i]
-            );
-        }
+        lv_chart_set_next_value(ecg_chart,ecg_series,125);
     }
 
     // ecg label
@@ -438,5 +491,4 @@ void ScreenBuilder::create_ecg_panel()
     
     
 }
-
 

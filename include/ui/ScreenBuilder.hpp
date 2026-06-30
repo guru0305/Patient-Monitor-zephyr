@@ -6,15 +6,16 @@ class ScreenBuilder
 {
     public:
         void build();
-        void UpdateHR(uint8_t hr);
-        void UpdateSPO2(uint8_t spo2);
-        void UpdateRR(uint8_t rr);
-        void UpdateSYS(uint8_t sys);
-        void UpdateDIAS(uint8_t dias);
+        void UpdateHR(uint8_t hr,bool hr_alarm);
+        void UpdateSPO2(uint8_t spo2,bool spo2_alarm);
+        void UpdateRR(uint8_t rr,bool rr_alarm);
+        void UpdateSYS(uint8_t sys,bool sys_alarm);
+        void UpdateDIAS(uint8_t dias,bool dias_alarm);
         void UpdateMEAN(uint8_t mean);
         void UpdateAlarmBar(const char* text, bool state);
+        void AddECGSample(uint16_t sample);
+        void UpdateFlashState(lv_obj_t* obj, bool alarm);
 
-    
     private:
         void create_header();
         void create_alarmtab();
@@ -25,6 +26,8 @@ class ScreenBuilder
         void create_ecg_panel();
         void create_hr_animation(lv_obj_t* heart_icon);
         void create_rr_animation(lv_obj_t* rr_icon);
+        void StartFlash(lv_obj_t* obj);
+        void StopFlash(lv_obj_t* obj);
 
         // main screen components
         lv_obj_t* main_screen;
@@ -66,10 +69,12 @@ class ScreenBuilder
         lv_obj_t* mean_unit_label;
         lv_obj_t* separator;
         lv_obj_t* unit_label;
+        
+        // ecg
         lv_obj_t* ecg_panel;
         lv_obj_t* ecg_label;
         lv_obj_t* ecg_chart;
-
+        lv_chart_series_t* ecg_series;
         
 
 };

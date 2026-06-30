@@ -11,31 +11,44 @@
 
 int main()
 {
-    SineWaveSource sn;
-    DataModel mod;
-    FakeVitalSource vit;
+    SineWaveSource source;
+    DataModel model;
+    FakeVitalSource vital_source;
 
-    ScreenBuilder builder;
+    ScreenBuilder screen_builder;
 
-    ApplicationController controller(sn, vit, mod);
+    ApplicationController controller(
+        source,
+        vital_source,
+        model);
 
-    AlarmEngine alarm(mod);
-    DashboardView dash(builder);
+    AlarmEngine alarm(model);
 
-    ViewController vcontroller(mod, alarm, dash);
+    DashboardView dashboard(screen_builder);
 
-    builder.build();
+    ViewController view_controller(
+        model,
+        alarm,
+        dashboard);
 
-    mod.attach(&alarm);
-    mod.attach(&vcontroller);
+    screen_builder.build();
+
+    model.attach(&alarm);
+    model.attach(&view_controller);
+
+    int64_t last_update = k_uptime_get();
 
     while (true)
     {
-        controller.Update();
-
         lv_timer_handler();
 
-        k_sleep(K_MSEC(20));
+        if ((k_uptime_get() - last_update) >= 1000)
+        {
+            controller.Update();
+            last_update = k_uptime_get();
+        }
+
+        k_sleep(K_MSEC(5));
     }
 
     return 0;

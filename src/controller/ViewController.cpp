@@ -1,5 +1,6 @@
 #include "controller/ViewController.hpp"
 
+
 ViewController::ViewController(
     DataModel& model,
     AlarmEngine& alarm,
