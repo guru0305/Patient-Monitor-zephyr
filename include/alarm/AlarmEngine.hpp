@@ -1,6 +1,6 @@
 #pragma once
-#include "observer/IObserver.hpp"
 #include "model/DataModel.hpp"
+#include <zephyr/kernel.h>
 
 struct AlarmState
 {
@@ -11,14 +11,14 @@ struct AlarmState
     bool dias_alarm = false;
 };
 
-class AlarmEngine : public IObserver
+class AlarmEngine
 {
     private:
         // we need model obj in alarm so we created a refernce 
         DataModel& model_; 
         AlarmState alarm_state_;
+        k_mutex alarm_mutex_;
 
-        void CheckThresholds();
 
         // thresh
         static constexpr const uint8_t hr_low_threshold   = 60;
@@ -35,6 +35,6 @@ class AlarmEngine : public IObserver
     public:
         // we used explicit because so we have valid parameterisation 
         explicit AlarmEngine(DataModel& model);
-        const AlarmState& get_alarm_state() const ;
-        void notify() override;
+        AlarmState get_alarm_state();
+        void CheckThresholds();
 };

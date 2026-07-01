@@ -20,6 +20,7 @@ target_sources(app PRIVATE
 
     src/datasource/SineWaveSource.cpp
     src/datasource/FakeVitalSource.cpp
+    src/datasource/AdcSource.cpp
 
     src/model/DataModel.cpp
 
@@ -29,6 +30,11 @@ target_sources(app PRIVATE
 
     src/ui/DashboardView.cpp
     src/ui/ScreenBuilder.cpp
+
+    src/threads/SensorThread.cpp
+    src/threads/LVGLThread.cpp
+    src/threads/AlarmThread.cpp
+    src/threads/UIMessageQueue.cpp
 
     assets/heart.c
     assets/spo2.c

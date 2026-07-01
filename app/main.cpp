@@ -8,6 +8,9 @@
 #include "alarm/AlarmEngine.hpp"
 #include "ui/DashboardView.hpp"
 #include "controller/ViewController.hpp"
+#include "threads/SensorThread.hpp"
+#include "threads/LVGLThread.hpp"
+#include "threads/AlarmThread.hpp"
 
 int main()
 {
@@ -31,24 +34,15 @@ int main()
         alarm,
         dashboard);
 
-    screen_builder.build();
-
-    model.attach(&alarm);
     model.attach(&view_controller);
 
-    int64_t last_update = k_uptime_get();
+    InitSensorThread(controller);
+    InitAlarmThread(alarm);
+    InitLVGLThread(dashboard,screen_builder);
 
     while (true)
     {
-        lv_timer_handler();
-
-        if ((k_uptime_get() - last_update) >= 1000)
-        {
-            controller.Update();
-            last_update = k_uptime_get();
-        }
-
-        k_sleep(K_MSEC(5));
+        k_sleep(K_FOREVER);
     }
 
     return 0;
