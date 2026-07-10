@@ -9,8 +9,8 @@ class ScreenBuilder
         void UpdateHR(uint8_t hr,bool hr_alarm);
         void UpdateSPO2(uint8_t spo2,bool spo2_alarm);
         void UpdateRR(uint8_t rr,bool rr_alarm);
-        void UpdateSYS(uint8_t sys,bool sys_alarm);
-        void UpdateDIAS(uint8_t dias,bool dias_alarm);
+        void UpdateSYS(uint8_t sys,bool sys_alarm,bool bp_alarm);
+        void UpdateDIAS(uint8_t dias,bool dias_alarm, bool bp_alarm);
         void UpdateMEAN(uint8_t mean);
         void UpdateAlarmBar(const char* text, bool state);
         void AddECGSample(uint16_t sample);

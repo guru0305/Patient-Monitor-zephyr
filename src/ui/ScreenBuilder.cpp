@@ -57,28 +57,28 @@ void ScreenBuilder::UpdateRR(uint8_t rr,bool rr_state)
     UpdateFlashState(rr_value_label, rr_state);
 }
 
-void ScreenBuilder::UpdateSYS(uint8_t sys,bool sys_state)
+void ScreenBuilder::UpdateSYS(uint8_t sys,bool sys_state,bool bp_alarm)
 {
     char buffer[8];
     snprintf(buffer,sizeof(buffer),"%u",sys);
     lv_label_set_text(systolic_value_label,buffer);
     lv_obj_set_style_bg_color(systolic_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
     lv_obj_set_style_text_color(systolic_value_label,sys_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_set_style_border_side(NIBP_panel,sys_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
-    lv_obj_set_style_border_color(NIBP_panel, sys_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
+    lv_obj_set_style_border_side(NIBP_panel,bp_alarm ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
+    lv_obj_set_style_border_color(NIBP_panel, bp_alarm ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
     UpdateFlashState(systolic_value_label, sys_state);
 
 }
 
-void ScreenBuilder::UpdateDIAS(uint8_t dias,bool dias_state)
+void ScreenBuilder::UpdateDIAS(uint8_t dias,bool dias_state,bool bp_alarm)
 {
     char buffer[8];
     snprintf(buffer,sizeof(buffer),"%u",dias);
     lv_label_set_text(diastolic_value_label,buffer);
     lv_obj_set_style_bg_color(diastolic_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
     lv_obj_set_style_text_color(diastolic_value_label,dias_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_set_style_border_side(NIBP_panel,dias_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
-    lv_obj_set_style_border_color(NIBP_panel, dias_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
+    lv_obj_set_style_border_side(NIBP_panel,bp_alarm ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
+    lv_obj_set_style_border_color(NIBP_panel, bp_alarm ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
     UpdateFlashState(diastolic_value_label, dias_state);
 }
 
