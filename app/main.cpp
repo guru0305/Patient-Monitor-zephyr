@@ -17,22 +17,11 @@ int main()
     SineWaveSource source;
     DataModel model;
     FakeVitalSource vital_source;
-
     ScreenBuilder screen_builder;
-
-    ApplicationController controller(
-        source,
-        vital_source,
-        model);
-
+    ApplicationController controller(source, vital_source, model);
     AlarmEngine alarm(model);
-
     DashboardView dashboard(screen_builder);
-
-    ViewController view_controller(
-        model,
-        alarm,
-        dashboard);
+    ViewController view_controller(model, alarm, dashboard);
 
     model.attach(&view_controller);
 
