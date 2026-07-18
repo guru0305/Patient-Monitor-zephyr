@@ -13,14 +13,22 @@ void SensorThreadEntry(
     void*,
     void*)
 {
+    uint16_t ecg_counter = 0;
+
     while (true)
     {
-        if (controller_ != nullptr)
+        controller_->UpdateECG();
+
+        ecg_counter++;
+
+        if (ecg_counter >= 250)
         {
-            controller_->Update();
+            ecg_counter = 0;
+
+            controller_->UpdateVitals();
         }
 
-        k_sleep(K_SECONDS(1));
+        k_sleep(K_MSEC(4));
     }
 }
 }

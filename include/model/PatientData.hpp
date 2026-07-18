@@ -6,7 +6,6 @@
 
 struct PatientData
 {
-    uint16_t ecg;
     uint8_t hr;
     uint8_t spo2;
     uint8_t rr;

@@ -15,5 +15,6 @@ public:
         FakeVitalSource& vital_source,
         DataModel& model);
 
-    void Update();
+    void UpdateECG();
+    void UpdateVitals();
 };

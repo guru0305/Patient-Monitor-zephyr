@@ -22,6 +22,12 @@ void LVGLThreadEntry(
 
     UIMessage message;
 
+    message.patient_data = {};
+    message.alarm_state = {};
+
+    uint32_t frame_count = 0;
+    int64_t last_time = k_uptime_get();
+
     while (true)
     {
         while (k_msgq_get(
@@ -29,15 +35,29 @@ void LVGLThreadEntry(
             &message,
             K_NO_WAIT) == 0)
         {
-            if (dashboard_ != nullptr)
-            {
-                dashboard_->Update(
-                    message.patient_data,
-                    message.alarm_state);
-            }
+            
+        }
+
+        if (dashboard_ != nullptr)
+        {
+            dashboard_->Update(
+                message.patient_data,
+                message.alarm_state);
         }
 
         lv_timer_handler();
+
+        frame_count++;
+
+        int64_t current_time = k_uptime_get();
+
+        if ((current_time - last_time) >= 1000)
+        {
+            printk("FPS: %u\n", frame_count);
+
+            frame_count = 0;
+            last_time = current_time;
+        }
 
         k_sleep(K_MSEC(5));
     }

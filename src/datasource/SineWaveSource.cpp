@@ -6,7 +6,7 @@
     constexpr float amplitude = 100.0f;
     constexpr float offset = 120.0f;
 
-    float value = offset + amplitude * std::sin(sample_index_ * 0.1f);
+    float value = offset + amplitude * std::sin(sample_index_ * 0.05f);
     sample_index_++;
 
     return static_cast<uint16_t>(value);

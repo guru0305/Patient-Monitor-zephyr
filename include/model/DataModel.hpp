@@ -4,6 +4,7 @@
 #include "observer/Subject.hpp"
 #include <zephyr/kernel.h>
 #include <zephyr/sys/ring_buffer.h>
+#include <cstddef>
 
 class DataModel : public Subject
 {

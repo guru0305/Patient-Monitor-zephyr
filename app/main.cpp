@@ -20,7 +20,7 @@ int main()
     ScreenBuilder screen_builder;
     ApplicationController controller(source, vital_source, model);
     AlarmEngine alarm(model);
-    DashboardView dashboard(screen_builder);
+    DashboardView dashboard(screen_builder,model);
     ViewController view_controller(model, alarm, dashboard);
 
     model.attach(&view_controller);

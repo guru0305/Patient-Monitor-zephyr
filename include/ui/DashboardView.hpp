@@ -3,13 +3,15 @@
 #include "model/PatientData.hpp"
 #include "alarm/AlarmEngine.hpp"
 #include "ui/ScreenBuilder.hpp"
+#include "model/DataModel.hpp"
 
 class DashboardView
 {
     private:
         ScreenBuilder& screen_builder_;
+        DataModel& model_;
     public:
-        explicit DashboardView(ScreenBuilder& screen_builder);
+        explicit DashboardView(ScreenBuilder& screen_builder, DataModel& model);
 
         void Update(
             const PatientData& data,

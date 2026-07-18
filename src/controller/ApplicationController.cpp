@@ -12,14 +12,11 @@ ApplicationController::ApplicationController(
 {
 }
 
-void ApplicationController::Update()
+void ApplicationController::UpdateVitals()
 {
     PatientData data{};
     VitalSigns vital = vital_source_.GetVitals();
 
-    uint16_t ecg_sample = source_.GetSample();
-
-    data.ecg = ecg_sample;
     data.hr = vital.hr;
     data.spo2 = vital.spo2;
     data.rr = vital.rr;
@@ -27,7 +24,12 @@ void ApplicationController::Update()
     data.sys = vital.sys;
     data.mean = vital.mean;
 
-    model_.PushECGSample(ecg_sample);
-
     model_.set_patient_data(data);
+}
+
+void ApplicationController::UpdateECG()
+{
+    uint16_t ecg_sample = source_.GetSample();
+
+    model_.PushECGSample(ecg_sample);
 }

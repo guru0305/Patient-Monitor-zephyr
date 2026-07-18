@@ -470,7 +470,7 @@ void ScreenBuilder::create_ecg_panel()
     lv_obj_set_style_bg_color(ecg_chart, lv_color_hex(0X000000), LV_PART_MAIN);
     lv_chart_set_type(ecg_chart, LV_CHART_TYPE_LINE);
     lv_chart_set_range(ecg_chart, LV_CHART_AXIS_PRIMARY_Y, 0, 250);
-    lv_chart_set_point_count(ecg_chart, 150);
+    lv_chart_set_point_count(ecg_chart, 500);
     lv_obj_set_style_size(ecg_chart, 0,0, LV_PART_INDICATOR);
     lv_obj_set_style_line_width(ecg_chart, 3, LV_PART_INDICATOR);
     lv_chart_set_div_line_count(ecg_chart, 20, 30);
