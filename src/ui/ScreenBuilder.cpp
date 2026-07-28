@@ -17,9 +17,20 @@ static void rr_anim_cb(void* var, int32_t value)
     lv_image_set_scale((lv_obj_t*)var, value);
 }
 
-static void flash_cb(void * var, int32_t value)
+void ScreenBuilder::GlobalFlashTimerCB(lv_timer_t* timer)
 {
-    lv_obj_set_style_bg_opa((lv_obj_t *)var,value ? LV_OPA_COVER : LV_OPA_0, LV_PART_MAIN);    
+    auto* self = static_cast<ScreenBuilder*>(lv_timer_get_user_data(timer));
+
+    self->flash_phase_ = !self->flash_phase_;
+    lv_opa_t opa = self->flash_phase_ ? LV_OPA_COVER : LV_OPA_0;
+
+    // Every currently-alarming panel reads the SAME phase on the SAME tick —
+    // that's what guarantees sync, no matter when each alarm started.
+    if (self->hr_alarming_)   lv_obj_set_style_bg_opa(self->hr_value_label,        opa, LV_PART_MAIN);
+    if (self->rr_alarming_)   lv_obj_set_style_bg_opa(self->rr_value_label,        opa, LV_PART_MAIN);
+    if (self->spo2_alarming_) lv_obj_set_style_bg_opa(self->spo2_value_label,      opa, LV_PART_MAIN);
+    if (self->sys_alarming_)  lv_obj_set_style_bg_opa(self->systolic_value_label,  opa, LV_PART_MAIN);
+    if (self->dias_alarming_) lv_obj_set_style_bg_opa(self->diastolic_value_label, opa, LV_PART_MAIN);
 }
 
 void ScreenBuilder::UpdateHR(uint8_t hr,bool hr_state)
@@ -30,7 +41,8 @@ void ScreenBuilder::UpdateHR(uint8_t hr,bool hr_state)
     lv_obj_set_style_bg_color(hr_value_label,lv_color_hex(0Xff0000), LV_PART_MAIN);
     lv_obj_set_style_text_color(hr_value_label,hr_state ?lv_color_hex(0Xffffff) : lv_color_hex(0x00FF00), LV_PART_MAIN);
     lv_obj_set_style_border_color(hr_panel, hr_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
-    UpdateFlashState(hr_value_label, hr_state);
+    UpdateFlashState(hr_value_label,&hr_alarming_,hr_state);     
+
 }
 
 void ScreenBuilder::UpdateSPO2(uint8_t spo2,bool spo2_state)
@@ -42,7 +54,8 @@ void ScreenBuilder::UpdateSPO2(uint8_t spo2,bool spo2_state)
     lv_obj_set_style_text_color(spo2_value_label,spo2_state ?lv_color_hex(0Xffffff) : lv_color_hex(0x00ffff), LV_PART_MAIN);
     lv_obj_set_style_border_side(spo2_panel,spo2_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
     lv_obj_set_style_border_color(spo2_panel, spo2_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
-    UpdateFlashState(spo2_value_label, spo2_state);
+    UpdateFlashState(spo2_value_label,&spo2_alarming_, spo2_state);   
+
 }
 
 void ScreenBuilder::UpdateRR(uint8_t rr,bool rr_state)
@@ -54,7 +67,7 @@ void ScreenBuilder::UpdateRR(uint8_t rr,bool rr_state)
     lv_obj_set_style_text_color(rr_value_label,rr_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffff00), LV_PART_MAIN);
     lv_obj_set_style_border_side(rr_panel,rr_state ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
     lv_obj_set_style_border_color(rr_panel, rr_state ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
-    UpdateFlashState(rr_value_label, rr_state);
+    UpdateFlashState(rr_value_label,&rr_alarming_,rr_state);     
 }
 
 void ScreenBuilder::UpdateSYS(uint8_t sys,bool sys_state,bool bp_alarm)
@@ -66,8 +79,7 @@ void ScreenBuilder::UpdateSYS(uint8_t sys,bool sys_state,bool bp_alarm)
     lv_obj_set_style_text_color(systolic_value_label,sys_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_set_style_border_side(NIBP_panel,bp_alarm ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
     lv_obj_set_style_border_color(NIBP_panel, bp_alarm ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
-    UpdateFlashState(systolic_value_label, sys_state);
-
+    UpdateFlashState(systolic_value_label,  &sys_alarming_,  sys_state);   
 }
 
 void ScreenBuilder::UpdateDIAS(uint8_t dias,bool dias_state,bool bp_alarm)
@@ -79,7 +91,7 @@ void ScreenBuilder::UpdateDIAS(uint8_t dias,bool dias_state,bool bp_alarm)
     lv_obj_set_style_text_color(diastolic_value_label,dias_state ?lv_color_hex(0Xffffff) : lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_set_style_border_side(NIBP_panel,bp_alarm ? LV_BORDER_SIDE_FULL : (lv_border_side_t)(LV_BORDER_SIDE_BOTTOM | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT), LV_PART_MAIN);
     lv_obj_set_style_border_color(NIBP_panel, bp_alarm ? lv_color_hex(0xff0000) : lv_color_hex(0X008b8b), LV_PART_MAIN);
-    UpdateFlashState(diastolic_value_label, dias_state);
+    UpdateFlashState(diastolic_value_label, &dias_alarming_, dias_state); 
 }
 
 void ScreenBuilder::UpdateMEAN(uint8_t mean)
@@ -95,25 +107,68 @@ void ScreenBuilder::AddECGSample(uint16_t sample)
     lv_chart_set_next_value(ecg_chart, ecg_series, sample);
 }
 
-void ScreenBuilder::UpdateAlarmBar(const char* text, bool state)
+void ScreenBuilder::UpdateAlarmBar(const char* text, AlarmPriority priority)
 {
-    lv_label_set_text(alarm_label,text);
-    lv_obj_set_style_bg_color(alarm_panel,state ? lv_color_hex(0x0d0000) : lv_color_hex(0x002200), LV_PART_MAIN);
-    lv_obj_set_style_border_color(alarm_panel,state ? lv_color_hex(0xff0000) : lv_color_hex(0x00ff00), LV_PART_MAIN);
-    lv_obj_set_style_text_color(alarm_label,state ? lv_color_hex(0xff0000) : lv_color_hex(0x00ff00), LV_PART_MAIN);
+    lv_label_set_text(alarm_label, text);
+
+    switch(priority)
+    {
+        case AlarmPriority::None:
+
+            lv_obj_set_style_bg_color(alarm_panel, lv_color_hex(0x002200), LV_PART_MAIN);
+            lv_obj_set_style_border_color(alarm_panel, lv_color_hex(0x00ff00), LV_PART_MAIN);
+            lv_obj_set_style_text_color(alarm_label, lv_color_hex(0x00ff00), LV_PART_MAIN);
+            break;
+
+        case AlarmPriority::Medium:
+
+            lv_obj_set_style_bg_color(alarm_panel, lv_color_hex(0x332200), LV_PART_MAIN);
+            lv_obj_set_style_border_color(alarm_panel, lv_color_hex(0xffaa00), LV_PART_MAIN);
+            lv_obj_set_style_text_color(alarm_label, lv_color_hex(0xffaa00), LV_PART_MAIN);
+            break;
+
+        case AlarmPriority::High:
+
+            lv_obj_set_style_bg_color(alarm_panel, lv_color_hex(0x220000), LV_PART_MAIN);
+            lv_obj_set_style_border_color(alarm_panel, lv_color_hex(0xff0000), LV_PART_MAIN);
+            lv_obj_set_style_text_color(alarm_label, lv_color_hex(0xff0000), LV_PART_MAIN);
+            break;
+    }
 }
 
-void ScreenBuilder::UpdateFlashState(lv_obj_t* obj, bool alarm)
+void ScreenBuilder::UpdateFlashState(lv_obj_t* obj, bool* alarming_flag, bool alarm)
 {
-    bool flashing = (lv_anim_get(obj, flash_cb) != nullptr);
+    *alarming_flag = alarm;
 
-    if(alarm && !flashing)
+    if (!alarm)
     {
-        StartFlash(obj);
+        // Snap off immediately. The shared timer only touches objects
+        // whose flag is true, so this one just stops being touched.
+        lv_obj_set_style_bg_opa(obj, LV_OPA_0, LV_PART_MAIN);
     }
-    else if(!alarm && flashing)
+}
+
+void ScreenBuilder::UpdateMonitorStatus(MonitorStatus status)
+{
+    switch(status)
     {
-        StopFlash(obj);
+        case MonitorStatus::Connected:
+
+            lv_label_set_text(status_label, "•CONNECTED");
+            lv_obj_set_style_text_color(status_label, lv_color_hex(0x00FF00),LV_PART_MAIN);
+            break;
+
+        case MonitorStatus::CheckLeads:
+
+            lv_label_set_text(status_label, "•CHECK LEADS");
+            lv_obj_set_style_text_color(status_label, lv_color_hex(0xFFAA00), LV_PART_MAIN);
+            break;
+
+        case MonitorStatus::Disconnected:
+
+            lv_label_set_text(status_label, "•DISCONNECTED");
+            lv_obj_set_style_text_color(status_label, lv_color_hex(0xFF0000), LV_PART_MAIN);
+            break;
     }
 }
 
@@ -130,6 +185,8 @@ void ScreenBuilder::build()
     create_NIBP_panel();
     create_rr_panel();
     create_ecg_panel();
+
+    flash_timer_ = lv_timer_create(GlobalFlashTimerCB, 150, this);
 }
 
 void ScreenBuilder::create_header()
@@ -145,13 +202,29 @@ void ScreenBuilder::create_header()
     lv_obj_set_style_border_width(header, 2, LV_PART_MAIN);
     lv_obj_set_style_border_side(header, (lv_border_side_t)(LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_BOTTOM), LV_PART_MAIN);
 
-    // header label
-    header_label = lv_label_create(header);
-    lv_label_set_text(header_label, "BED 01");
-    lv_obj_align(header_label, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_text_color(header_label, lv_color_hex(0xFFffff), LV_PART_MAIN);
-    lv_obj_set_style_text_font(header_label, &lv_font_montserrat_16, LV_PART_MAIN);
-    lv_obj_clear_flag(header_label, LV_OBJ_FLAG_SCROLLABLE);
+    // bed label
+    bed_label = lv_label_create(header);
+    lv_label_set_text(bed_label, "BED-01");
+    lv_obj_align(bed_label, LV_ALIGN_LEFT_MID, 0, 0);
+    lv_obj_set_style_text_color(bed_label, lv_color_hex(0X008b8b), LV_PART_MAIN);
+    lv_obj_set_style_text_font(bed_label, &lv_font_montserrat_12, LV_PART_MAIN);
+    lv_obj_clear_flag(bed_label, LV_OBJ_FLAG_SCROLLABLE);
+
+    // patient monitor label
+    pat_mon_label = lv_label_create(header);
+    lv_label_set_text(pat_mon_label, "Patient Monitor");
+    lv_obj_align(pat_mon_label, LV_ALIGN_CENTER, -15, 0);
+    lv_obj_set_style_text_color(pat_mon_label, lv_color_hex(0X008b8b), LV_PART_MAIN);
+    lv_obj_set_style_text_font(pat_mon_label, &lv_font_montserrat_14, LV_PART_MAIN);
+    lv_obj_clear_flag(pat_mon_label, LV_OBJ_FLAG_SCROLLABLE);
+
+    // status label
+    status_label = lv_label_create(header);
+    lv_label_set_text(status_label, "DISCONNECTED");
+    lv_obj_align(status_label, LV_ALIGN_RIGHT_MID, 10, 0);
+    lv_obj_set_style_text_color(status_label, lv_color_hex(0xFFffff), LV_PART_MAIN);
+    lv_obj_set_style_text_font(status_label, &lv_font_montserrat_12, LV_PART_MAIN);
+    lv_obj_clear_flag(status_label, LV_OBJ_FLAG_SCROLLABLE);
 
 }
 
@@ -184,33 +257,6 @@ void ScreenBuilder::create_alarmtab()
     lv_obj_set_style_text_color(alarm_label, lv_color_hex(0x00FF00), LV_PART_MAIN);
     lv_obj_align(alarm_label, LV_ALIGN_CENTER, 0, 0);
 
-}
-
-void ScreenBuilder::StartFlash(lv_obj_t* obj)
-{
-    lv_anim_t anim;
-    lv_anim_init(&anim);
-
-    lv_anim_set_var(&anim, obj);
-    lv_anim_set_exec_cb(&anim, flash_cb);
-
-    lv_anim_set_values(&anim, 1, 0);
-    lv_anim_set_path_cb(&anim, lv_anim_path_step);
-    lv_anim_set_duration(&anim, 150);
-    lv_anim_set_playback_duration(&anim, 150);
-    lv_anim_set_repeat_count(&anim, LV_ANIM_REPEAT_INFINITE);
-
-    lv_anim_start(&anim);
-}
-
-void ScreenBuilder::StopFlash(lv_obj_t* obj)
-{
-    lv_anim_delete(obj, flash_cb);
-
-    lv_obj_set_style_bg_opa(
-        obj,
-        LV_OPA_0,
-        LV_PART_MAIN);
 }
 
 void ScreenBuilder::create_hr_panel()
@@ -470,13 +516,13 @@ void ScreenBuilder::create_ecg_panel()
     lv_obj_set_style_bg_color(ecg_chart, lv_color_hex(0X000000), LV_PART_MAIN);
     lv_chart_set_type(ecg_chart, LV_CHART_TYPE_LINE);
     lv_chart_set_range(ecg_chart, LV_CHART_AXIS_PRIMARY_Y, 0, 250);
-    lv_chart_set_point_count(ecg_chart, 500);
+    lv_chart_set_point_count(ecg_chart, 1250);
     lv_obj_set_style_size(ecg_chart, 0,0, LV_PART_INDICATOR);
     lv_obj_set_style_line_width(ecg_chart, 3, LV_PART_INDICATOR);
     lv_chart_set_div_line_count(ecg_chart, 20, 30);
     lv_obj_set_style_line_opa(ecg_chart, LV_OPA_20, LV_PART_MAIN);
     ecg_series = lv_chart_add_series(ecg_chart, lv_color_hex(0x00ff00), LV_CHART_AXIS_PRIMARY_Y);
-    for(int i=0;i<120;i++)
+    for(int i=0;i<1650;i++)
     {
         lv_chart_set_next_value(ecg_chart,ecg_series,125);
     }
@@ -487,8 +533,6 @@ void ScreenBuilder::create_ecg_panel()
     lv_obj_align(ecg_label, LV_ALIGN_TOP_LEFT, 10, 10);
     lv_obj_set_style_text_color(ecg_label, lv_color_hex(0x008b8b), LV_PART_MAIN);
     lv_obj_set_style_text_font(ecg_label, &lv_font_montserrat_18, LV_PART_MAIN);
-    lv_obj_clear_flag(ecg_label, LV_OBJ_FLAG_SCROLLABLE);
-    
-    
+    lv_obj_clear_flag(ecg_label, LV_OBJ_FLAG_SCROLLABLE);  
 }
 

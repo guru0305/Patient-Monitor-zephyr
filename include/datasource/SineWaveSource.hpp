@@ -7,6 +7,7 @@ class SineWaveSource : public IDataSource
 {
 public:
     uint16_t GetSample() override;
+    MonitorStatus GetMonitorStatus() const override;
 
 private:
     uint32_t sample_index_ = 0;

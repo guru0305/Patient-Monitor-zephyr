@@ -24,6 +24,8 @@ void ApplicationController::UpdateVitals()
     data.sys = vital.sys;
     data.mean = vital.mean;
 
+    data.monitor_status = source_.GetMonitorStatus();  
+    
     model_.set_patient_data(data);
 }
 

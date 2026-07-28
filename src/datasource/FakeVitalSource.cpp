@@ -2,7 +2,7 @@
 
 VitalSigns FakeVitalSource :: GetVitals()
 {
-    if(count >= 18)
+    if(count >= static_cast<int>(kSize))
     {
         count=0;
     }

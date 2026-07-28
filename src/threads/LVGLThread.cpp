@@ -10,15 +10,16 @@ namespace
 DashboardView* dashboard_ = nullptr;
 ScreenBuilder* screen_builder_ = nullptr;
 
+K_SEM_DEFINE(lvgl_ready_sem, 0, 1);
+
 void LVGLThreadEntry(
     void*,
     void*,
     void*)
 {
-    if (screen_builder_ != nullptr)
-    {
-        screen_builder_->build();
-    }
+    k_sem_take(&lvgl_ready_sem, K_FOREVER);
+
+    screen_builder_->build();
 
     UIMessage message;
 
@@ -35,16 +36,13 @@ void LVGLThreadEntry(
             &message,
             K_NO_WAIT) == 0)
         {
-            
+
         }
 
-        if (dashboard_ != nullptr)
-        {
-            dashboard_->Update(
-                message.patient_data,
-                message.alarm_state);
-        }
-
+        dashboard_->Update(
+            message.patient_data,
+            message.alarm_state);
+        
         lv_timer_handler();
 
         frame_count++;
@@ -71,6 +69,7 @@ void InitLVGLThread(
 {
     dashboard_ = &dashboard;
     screen_builder_ = &screen_builder;
+    k_sem_give(&lvgl_ready_sem);
 }
 
 K_THREAD_DEFINE(

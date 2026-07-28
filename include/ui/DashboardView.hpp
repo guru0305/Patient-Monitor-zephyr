@@ -4,6 +4,7 @@
 #include "alarm/AlarmEngine.hpp"
 #include "ui/ScreenBuilder.hpp"
 #include "model/DataModel.hpp"
+#include "alarm/AlarmTypes.hpp"
 
 class DashboardView
 {

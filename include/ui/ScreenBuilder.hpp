@@ -1,6 +1,8 @@
 #ifndef SCREEN_BUILDER_H
 #define SCREEN_BUILDER_H
 #include "lvgl.h"
+#include "alarm/AlarmTypes.hpp"
+#include "model/MonitorStatus.hpp"
 
 class ScreenBuilder
 {
@@ -12,9 +14,10 @@ class ScreenBuilder
         void UpdateSYS(uint8_t sys,bool sys_alarm,bool bp_alarm);
         void UpdateDIAS(uint8_t dias,bool dias_alarm, bool bp_alarm);
         void UpdateMEAN(uint8_t mean);
-        void UpdateAlarmBar(const char* text, bool state);
+        void UpdateAlarmBar(const char* text, AlarmPriority priority);
         void AddECGSample(uint16_t sample);
-        void UpdateFlashState(lv_obj_t* obj, bool alarm);
+        void UpdateFlashState(lv_obj_t* obj, bool* alarming_flag, bool alarm);
+        void UpdateMonitorStatus(MonitorStatus status);
 
     private:
         void create_header();
@@ -28,11 +31,14 @@ class ScreenBuilder
         void create_rr_animation(lv_obj_t* rr_icon);
         void StartFlash(lv_obj_t* obj);
         void StopFlash(lv_obj_t* obj);
+        static void GlobalFlashTimerCB(lv_timer_t* timer); 
 
         // main screen components
         lv_obj_t* main_screen;
         lv_obj_t* header;
-        lv_obj_t* header_label;
+        lv_obj_t* bed_label;
+        lv_obj_t* pat_mon_label;
+        lv_obj_t* status_label;
 
         // alarm components
         lv_obj_t* alarm_outer_panel;
@@ -75,6 +81,16 @@ class ScreenBuilder
         lv_obj_t* ecg_label;
         lv_obj_t* ecg_chart;
         lv_chart_series_t* ecg_series;
+        lv_obj_t* ecg_lead_dot = nullptr;
+
+        lv_timer_t* flash_timer_ = nullptr;
+
+        bool flash_phase_ = false;
+        bool hr_alarming_   = false;
+        bool rr_alarming_   = false;
+        bool spo2_alarming_ = false;
+        bool sys_alarming_  = false;
+        bool dias_alarming_ = false;
         
 
 };

@@ -1,15 +1,7 @@
 #pragma once
 #include "model/DataModel.hpp"
+#include "alarm/AlarmTypes.hpp"
 #include <zephyr/kernel.h>
-
-struct AlarmState
-{
-    bool hr_alarm = false;
-    bool spo2_alarm = false;
-    bool rr_alarm = false;
-    bool sys_alarm = false;
-    bool dias_alarm = false;
-};
 
 class AlarmEngine
 {
@@ -22,9 +14,9 @@ class AlarmEngine
 
         // thresh
         static constexpr const uint8_t hr_low_threshold   = 60;
-        static constexpr const uint8_t hr_high_threshold = 100;
+        static constexpr const uint8_t hr_high_threshold = 120;
         static constexpr const uint8_t spo2_low_threshold = 90;
-        static constexpr const uint8_t rr_low_threshold   = 12;
+        static constexpr const uint8_t rr_low_threshold   = 10;
         static constexpr const uint8_t rr_high_threshold = 20;
         static constexpr const uint8_t sys_low_threshold  = 90;
         static constexpr const uint8_t sys_high_threshold = 140;

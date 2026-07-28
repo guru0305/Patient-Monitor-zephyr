@@ -9,17 +9,18 @@ namespace
 
 AlarmEngine* alarm_ = nullptr;
 
+K_SEM_DEFINE(alarm_ready_sem, 0, 1);
+
 void AlarmThreadEntry(
     void*,
     void*,
     void*)
 {
+    k_sem_take(&alarm_ready_sem, K_FOREVER);
+
     while (true)
     {
-        if (alarm_ != nullptr)
-        {
-            alarm_->CheckThresholds();
-        }
+        alarm_->CheckThresholds();
 
         k_sleep(K_MSEC(50));
     }
@@ -30,6 +31,7 @@ void AlarmThreadEntry(
 void InitAlarmThread(AlarmEngine& alarm)
 {
     alarm_ = &alarm;
+    k_sem_give(&alarm_ready_sem);
 }
 
 K_THREAD_DEFINE(

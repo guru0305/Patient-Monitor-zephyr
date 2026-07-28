@@ -11,3 +11,8 @@
 
     return static_cast<uint16_t>(value);
  }
+
+ MonitorStatus SineWaveSource::GetMonitorStatus() const
+{
+    return MonitorStatus::Connected;
+}
