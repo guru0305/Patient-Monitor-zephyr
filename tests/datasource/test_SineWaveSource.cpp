@@ -41,3 +41,18 @@ TEST(SineWaveSourceTest, ConsecutiveSamplesChange)
 
     EXPECT_TRUE(changed);
 }
+TEST(SineWaveSourceTest, MonitorStatusIsConnected)
+{
+    SineWaveSource source;
+
+    EXPECT_EQ(source.GetMonitorStatus(), MonitorStatus::Connected);
+}
+
+TEST(IDataSourceTest, VirtualDestructorIsExecuted)
+{
+    IDataSource* source = new SineWaveSource();
+
+    delete source;
+
+    SUCCEED();
+}

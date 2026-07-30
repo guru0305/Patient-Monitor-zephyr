@@ -19,6 +19,68 @@ class ScreenBuilder
         void UpdateFlashState(lv_obj_t* obj, bool* alarming_flag, bool alarm);
         void UpdateMonitorStatus(MonitorStatus status);
 
+    #ifdef UNIT_TEST
+    lv_obj_t* GetHRValueLabel() const
+    {
+        return hr_value_label;
+    }
+
+    lv_obj_t* GetHRPanel() const
+    {
+        return hr_panel;
+    }
+    bool GetHRAlarmState() const
+    {
+        return hr_alarming_;
+    }
+    lv_obj_t* GetSPO2ValueLabel() const
+    {
+        return spo2_value_label;
+    }
+
+    lv_obj_t* GetRRValueLabel() const
+    {
+        return rr_value_label;
+    }
+
+    lv_obj_t* GetSYSValueLabel() const
+    {
+        return systolic_value_label;
+    }
+
+    lv_obj_t* GetDIASValueLabel() const
+    {
+        return diastolic_value_label;
+    }
+
+    lv_obj_t* GetMEANValueLabel() const
+    {
+        return mean_value_label;
+    }
+    lv_obj_t* GetAlarmLabel() const
+    {
+        return alarm_label;
+    }
+
+    lv_obj_t* GetAlarmPanel() const
+    {
+        return alarm_panel;
+    }
+    lv_obj_t* GetStatusLabel() const
+    {
+        return status_label;
+    }
+    static void InvokeFlashTimer(lv_timer_t* timer)
+    {
+        GlobalFlashTimerCB(timer);
+    }
+
+    lv_timer_t* GetFlashTimer() const
+    {
+        return flash_timer_;
+    }
+    #endif
+
     private:
         void create_header();
         void create_alarmtab();
@@ -91,7 +153,6 @@ class ScreenBuilder
         bool spo2_alarming_ = false;
         bool sys_alarming_  = false;
         bool dias_alarming_ = false;
-        
 
 };
 

@@ -133,6 +133,9 @@ void ScreenBuilder::UpdateAlarmBar(const char* text, AlarmPriority priority)
             lv_obj_set_style_border_color(alarm_panel, lv_color_hex(0xff0000), LV_PART_MAIN);
             lv_obj_set_style_text_color(alarm_label, lv_color_hex(0xff0000), LV_PART_MAIN);
             break;
+
+        default:
+            break;
     }
 }
 
@@ -168,6 +171,9 @@ void ScreenBuilder::UpdateMonitorStatus(MonitorStatus status)
 
             lv_label_set_text(status_label, "•DISCONNECTED");
             lv_obj_set_style_text_color(status_label, lv_color_hex(0xFF0000), LV_PART_MAIN);
+            break;
+
+        default:
             break;
     }
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(PatientMonitorTests LANGUAGES CXX)
+project(PatientMonitorTests LANGUAGES C CXX)
 
 option(ENABLE_COVERAGE "Enable coverage reporting" OFF)
 
@@ -32,6 +32,11 @@ set(PROJECT_SOURCES
     ../src/model/DataModel.cpp
     ../src/alarm/AlarmEngine.cpp
     ../src/controller/ViewController.cpp
+    ../src/ui/ScreenBuilder.cpp
+
+    ../assets/heart.c
+    ../assets/spo2.c
+    ../assets/rr.c
 
 
     stubs/threads/UIMessageQueue.cpp
@@ -51,6 +56,18 @@ set(TEST_SOURCES
     model/test_DataModel.cpp
     controller/test_ViewController.cpp
     alarm/test_AlarmEngine.cpp
+
+    ui/test_ScreenBuilder.cpp
+)
+
+set(LV_BUILD_CONF_PATH
+    "${CMAKE_CURRENT_SOURCE_DIR}/../lv_conf.h"
+    CACHE FILEPATH "LVGL configuration"
+)
+
+add_subdirectory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../thirdparty/lvgl
+    ${CMAKE_BINARY_DIR}/lvgl
 )
 
 # ------------------------------------------------------------
@@ -72,6 +89,8 @@ if(ENABLE_COVERAGE)
         -O0
         -g
         --coverage
+        -fno-exceptions
+        -fno-rtti
     )
 
     target_link_options(PatientMonitorTests PRIVATE
@@ -87,6 +106,9 @@ target_include_directories(PatientMonitorTests PRIVATE
     ${PROJECT_SOURCE_DIR}/stubs
     ${PROJECT_SOURCE_DIR}/../include
     ${PROJECT_SOURCE_DIR}
+
+    ${PROJECT_SOURCE_DIR}/../thirdparty/lvgl
+    ${PROJECT_SOURCE_DIR}/../thirdparty/lvgl/src
 )
 
 # ------------------------------------------------------------
@@ -95,6 +117,11 @@ target_include_directories(PatientMonitorTests PRIVATE
 target_link_libraries(PatientMonitorTests PRIVATE
     GTest::gtest
     GTest::gtest_main
+    lvgl
+)
+
+target_compile_definitions(PatientMonitorTests PRIVATE
+    UNIT_TEST
 )
 
 include(GoogleTest)
@@ -126,7 +153,7 @@ if(ENABLE_COVERAGE AND LCOV_EXECUTABLE AND GENHTML_EXECUTABLE)
             "/usr/*"
             "*/_deps/*"
             "*/tests/*"
-            #"*/include/observer/IObserver.hpp"
+            "*/thirdparty/lvgl/*"
             --rc branch_coverage=1
             --ignore-errors mismatch,inconsistent,unused
             --output-file coverage.info

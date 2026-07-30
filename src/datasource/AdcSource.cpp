@@ -14,14 +14,12 @@ bool AdcSource::Init()
 
     if (!device_is_ready(usb_dev_))
     {
-        printk("CDC ACM device not ready\n");
         return false;
     }
 
     int ret = usb_enable(NULL);
     if (ret)
     {
-        printk("usb_enable() failed: %d\n", ret);
         return false;
     }
 
@@ -29,8 +27,6 @@ bool AdcSource::Init()
 
     uart_irq_callback_user_data_set(usb_dev_, &AdcSource::UartIsr, this);
     uart_irq_rx_enable(usb_dev_);
-
-    printk("USB CDC initialized\n");
 
     return true;
 }

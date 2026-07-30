@@ -313,7 +313,7 @@
 #define LV_USE_DRAW_DAVE2D 0
 
 /** Draw using cached SDL textures*/
-#define LV_USE_DRAW_SDL 1
+#define LV_USE_DRAW_SDL 0
 
 /** Use VG-Lite GPU. */
 #define LV_USE_DRAW_VG_LITE 0
@@ -1284,7 +1284,7 @@
 #endif
 
 /** Enable emulated input devices, time emulation, and screenshot compares. */
-#define LV_USE_TEST 0
+#define LV_USE_TEST 1
 #if LV_USE_TEST
 
 /** Enable `lv_test_screenshot_compare`.
@@ -1309,7 +1309,7 @@
  *==================*/
 
 /** Use SDL to open window on PC and handle mouse and keyboard. */
-#define LV_USE_SDL              1
+#define LV_USE_SDL              0
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH     <SDL2/SDL.h>
     #define LV_SDL_RENDER_MODE      LV_DISPLAY_RENDER_MODE_DIRECT   /**< LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance */
@@ -1491,10 +1491,10 @@
 *======================*/
 
 /** Enable examples to be built with the library. */
-#define LV_BUILD_EXAMPLES 1
+#define LV_BUILD_EXAMPLES 0
 
 /** Build the demos */
-#define LV_BUILD_DEMOS 1
+#define LV_BUILD_DEMOS 0
 
 /*===================
  * DEMO USAGE

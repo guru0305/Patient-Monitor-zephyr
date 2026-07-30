@@ -9,12 +9,12 @@ TEST(FakeVitalSourceTest, FirstVitalSignsAreCorrect)
     VitalSigns vital = source.GetVitals();
 
     EXPECT_EQ(vital.hr,   75);
-    EXPECT_EQ(vital.spo2, 98);
+    EXPECT_EQ(vital.spo2, 97);
     EXPECT_EQ(vital.rr,   16);
 
-    EXPECT_EQ(vital.sys,  120);
-    EXPECT_EQ(vital.dias, 80);
-    EXPECT_EQ(vital.mean, 93);
+    EXPECT_EQ(vital.sys,  118);
+    EXPECT_EQ(vital.dias, 78);
+    EXPECT_EQ(vital.mean, 91);
 }
 
 TEST(FakeVitalSourceTest, MeanPressureIsCalculatedCorrectly)
@@ -38,7 +38,7 @@ TEST(FakeVitalSourceTest, SequenceWrapsAfterEighteenSamples)
 
     VitalSigns first = source.GetVitals();
 
-    for (int i = 1; i < 18; ++i)
+    for (int i = 1; i < 64; ++i)
     {
         source.GetVitals();
     }

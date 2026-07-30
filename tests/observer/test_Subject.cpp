@@ -7,7 +7,8 @@ TEST(SubjectTest, NotifyWithoutObserversDoesNotCrash)
 {
     Subject subject;
 
-    EXPECT_NO_THROW(subject.notify_observers());
+    subject.notify_observers();
+    SUCCEED();
 }
 
 TEST(SubjectTest, NotifyOneObserver)
@@ -19,4 +20,13 @@ TEST(SubjectTest, NotifyOneObserver)
     subject.notify_observers();
 
     EXPECT_EQ(observer.notify_count, 1);
+}
+
+TEST(IObserverTest, VirtualDestructorIsExecuted)
+{
+    IObserver* observer = new MockObserver();
+
+    delete observer;
+
+    SUCCEED();
 }
