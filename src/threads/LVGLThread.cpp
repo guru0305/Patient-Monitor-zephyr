@@ -58,7 +58,7 @@ void LVGLThreadEntry(
         }
 
         k_sleep(K_MSEC(5));
-    }
+    }// LCOV_EXCL_LINE
 }
 
 }
@@ -71,6 +71,20 @@ void InitLVGLThread(
     screen_builder_ = &screen_builder;
     k_sem_give(&lvgl_ready_sem);
 }
+
+#ifdef UNIT_TEST
+#include <setjmp.h>
+
+extern jmp_buf mock_thread_exit;
+
+void RunLVGLThreadForTest()
+{
+    if (setjmp(mock_thread_exit) == 0)
+    {
+        LVGLThreadEntry(nullptr, nullptr, nullptr);
+    }
+}
+#endif
 
 K_THREAD_DEFINE(
     lvgl_thread,

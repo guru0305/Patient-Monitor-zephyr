@@ -29,17 +29,26 @@ set(PROJECT_SOURCES
     ../src/observer/Subject.cpp
     ../src/datasource/SineWaveSource.cpp
     ../src/datasource/FakeVitalSource.cpp
+    ../src/datasource/AdcSource.cpp
     ../src/model/DataModel.cpp
     ../src/alarm/AlarmEngine.cpp
+    ../src/controller/ApplicationController.cpp
     ../src/controller/ViewController.cpp
+    ../src/ui/DashboardView.cpp
     ../src/ui/ScreenBuilder.cpp
+    ../src/threads/SensorThread.cpp
+    ../src/threads/AlarmThread.cpp
+    ../src/threads/LVGLThread.cpp
 
     ../assets/heart.c
     ../assets/spo2.c
     ../assets/rr.c
 
-
+    stubs/zephyr/drivers/uart.cpp
     stubs/threads/UIMessageQueue.cpp
+    stubs/zephyr/device.cpp
+    stubs/zephyr/usb/usb_device.cpp
+    stubs/zephyr/kernel.cpp
 )
 
 # ------------------------------------------------------------
@@ -52,12 +61,19 @@ set(TEST_SOURCES
 
     datasource/test_SineWaveSource.cpp
     datasource/test_FakeVitalSource.cpp
+    datasource/test_AdcSource.cpp
 
     model/test_DataModel.cpp
     controller/test_ViewController.cpp
+    controller/test_ApplicationController.cpp
     alarm/test_AlarmEngine.cpp
 
+    threads/test_SensorThread.cpp
+    threads/test_AlarmThread.cpp
+    threads/test_LVGLThread.cpp
+
     ui/test_ScreenBuilder.cpp
+    ui/test_DashboardView.cpp
 )
 
 set(LV_BUILD_CONF_PATH
@@ -161,6 +177,7 @@ if(ENABLE_COVERAGE AND LCOV_EXECUTABLE AND GENHTML_EXECUTABLE)
         COMMAND ${GENHTML_EXECUTABLE}
             coverage.info
             --branch-coverage
+            --no-function-coverage
             --output-directory coverage
 
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

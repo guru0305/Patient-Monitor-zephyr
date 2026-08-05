@@ -77,7 +77,8 @@ void AdcSource::Process()
                 line_buffer_[line_index_] = '\0';
                 char* token = strtok(line_buffer_, ",");
 
-                if(token != nullptr)
+                //if(token != nullptr)
+                if(true)
                 {
                     uint16_t sample = static_cast<uint16_t>(atoi(token));
 

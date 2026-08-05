@@ -34,6 +34,20 @@ void InitAlarmThread(AlarmEngine& alarm)
     k_sem_give(&alarm_ready_sem);
 }
 
+#ifdef UNIT_TEST
+#include <setjmp.h>
+
+extern jmp_buf mock_thread_exit;
+
+void RunAlarmThreadForTest()
+{
+    if (setjmp(mock_thread_exit) == 0)
+    {
+        AlarmThreadEntry(nullptr, nullptr, nullptr);
+    }
+}
+#endif
+
 K_THREAD_DEFINE(
     alarm_thread,
     2048,

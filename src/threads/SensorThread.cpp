@@ -49,6 +49,20 @@ void InitSensorThread(ApplicationController& controller,
     k_sem_give(&sensor_ready_sem);
 }
 
+#ifdef UNIT_TEST
+#include <setjmp.h>
+
+extern jmp_buf mock_thread_exit;
+
+void RunSensorThreadForTest()
+{
+    if (setjmp(mock_thread_exit) == 0)
+    {
+        SensorThreadEntry(nullptr, nullptr, nullptr);
+    }
+}
+#endif
+
 K_THREAD_DEFINE(
     sensor_thread, 2048, SensorThreadEntry,
     nullptr, nullptr, nullptr,

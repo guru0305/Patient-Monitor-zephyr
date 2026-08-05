@@ -5,12 +5,23 @@
 #include "alarm/AlarmEngine.hpp"
 #include "threads/UIMessageQueue.hpp"
 #include "ui/DashboardView.hpp"
+#include "ui/ScreenBuilder.hpp"
+#include "lvgl.h"
+#include "others/test/lv_test_display.h"
 
 TEST(ViewControllerTest, NotifySendsMessageToQueue)
 {
+    lv_init();
+
+    lv_display_t* display = lv_test_display_create(480, 320);
+
     DataModel model;
     AlarmEngine alarm(model);
-    DashboardView view;
+
+    ScreenBuilder builder;
+    builder.build();
+
+    DashboardView view(builder, model);
 
     ViewController controller(
         model,
@@ -42,13 +53,24 @@ TEST(ViewControllerTest, NotifySendsMessageToQueue)
     EXPECT_FALSE(mock_last_message.alarm_state.rr_alarm);
     EXPECT_FALSE(mock_last_message.alarm_state.sys_alarm);
     EXPECT_FALSE(mock_last_message.alarm_state.dias_alarm);
+
+    lv_display_delete(display);
+    lv_deinit();
 }
 
 TEST(ViewControllerTest, QueueFullBranchIsExecuted)
 {
+    lv_init();
+
+    lv_display_t* display = lv_test_display_create(480, 320);
+
     DataModel model;
     AlarmEngine alarm(model);
-    DashboardView view;
+
+    ScreenBuilder builder;
+    builder.build();
+
+    DashboardView view(builder, model);
 
     ViewController controller(
         model,
@@ -60,4 +82,7 @@ TEST(ViewControllerTest, QueueFullBranchIsExecuted)
     controller.notify();
 
     SUCCEED();
+
+    lv_display_delete(display);
+    lv_deinit();
 }

@@ -6,3 +6,7 @@
 void InitLVGLThread(
     DashboardView& dashboard,
     ScreenBuilder& screen_builder);
+
+#ifdef UNIT_TEST
+void RunLVGLThreadForTest();
+#endif
