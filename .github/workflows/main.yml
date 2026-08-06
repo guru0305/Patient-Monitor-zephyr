@@ -21,18 +21,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Clone LVGL
-        run: |
-          git clone --depth 1 https://github.com/lvgl/lvgl.git thirdparty/lvgl
-
-      - name: Verify LVGL files
-        run: |
-          pwd
-          ls -l thirdparty/lvgl
-          ls -l thirdparty/lvgl/src
-          ls -l thirdparty/lvgl/src/others
-          ls -l thirdparty/lvgl/src/others/test
-
       - name: Install Dependencies
         run: |
           sudo apt update
@@ -48,15 +36,12 @@ jobs:
           cmake \
             -S tests \
             -B tests/build \
-            -DENABLE_COVERAGE=ON
-
-      - name: Show compile command
-        run: |
-          cat tests/build/compile_commands.json | grep test_ViewController.cpp
+            -DENABLE_COVERAGE=ON \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Build Tests
         run: |
-          cmake --build tests/build
+          cmake --build tests/build --parallel
 
       - name: Run Google Tests
         run: |
