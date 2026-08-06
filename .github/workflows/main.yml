@@ -25,6 +25,14 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/lvgl/lvgl.git thirdparty/lvgl
 
+      - name: Verify LVGL files
+        run: |
+          pwd
+          ls -l thirdparty/lvgl
+          ls -l thirdparty/lvgl/src
+          ls -l thirdparty/lvgl/src/others
+          ls -l thirdparty/lvgl/src/others/test
+
       - name: Install Dependencies
         run: |
           sudo apt update
@@ -41,6 +49,10 @@ jobs:
             -S tests \
             -B tests/build \
             -DENABLE_COVERAGE=ON
+
+      - name: Show compile command
+        run: |
+          cat tests/build/compile_commands.json | grep test_ViewController.cpp
 
       - name: Build Tests
         run: |
