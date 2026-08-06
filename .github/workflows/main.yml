@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Patient Monitor CI
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - feature
 
 jobs:
-  unit-test:
+  unit-tests:
 
     runs-on: ubuntu-24.04
 
@@ -26,9 +26,9 @@ jobs:
           sudo apt update
 
           sudo apt install -y \
+            build-essential \
             cmake \
             ninja-build \
-            build-essential \
             lcov
 
       - name: Configure CMake
@@ -36,13 +36,24 @@ jobs:
           cmake \
             -S tests \
             -B tests/build \
-            -DENABLE_COVERAGE=ON \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            -DENABLE_COVERAGE=ON
 
-      - name: Build Tests
+      - name: Build Unit Tests
         run: |
           cmake --build tests/build --parallel
 
       - name: Run Google Tests
+        working-directory: tests/build
         run: |
-          ./tests/build/PatientMonitorTests
+          ./PatientMonitorTests
+
+      - name: Generate Coverage Report
+        working-directory: tests/build
+        run: |
+          make coverage
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Coverage-Report
+          path: tests/build/coverage
